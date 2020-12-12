@@ -7,9 +7,9 @@ pub use entity::Entity;
 pub use sphere::Sphere;
 
 pub struct IntersectionResult {
-    intersection_point: Point,
-    distance: Float,
-    normal: Point,
+    pub intersection_point: Point,
+    pub distance: Float,
+    pub normal: Point,
 }
 
 impl IntersectionResult {

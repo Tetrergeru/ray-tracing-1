@@ -1,11 +1,8 @@
-use image::{
-    Rgb,
-    RgbImage,
-};
+use image::{Rgb, RgbImage};
 
 use crate::Float;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Color {
     r: Float,
     g: Float,
@@ -14,7 +11,7 @@ pub struct Color {
 
 impl Color {
     pub fn new(r: Float, g: Float, b: Float) -> Self {
-        Self {r, g, b}
+        Self { r, g, b }
     }
 
     pub fn to_rgb(&self) -> Rgb<u8> {
@@ -23,12 +20,12 @@ impl Color {
 }
 
 fn to_byte(number: Float) -> u8 {
-    if number > 255.0 {
+    if number >= 1.0 {
         255
-    } else if number < 0.0 {
+    } else if number <= 0.0 {
         0
     } else {
-        number as u8
+        (number * 255.0) as u8
     }
 }
 
@@ -45,9 +42,7 @@ impl ColorMatrix {
                 matrix[y].push(Color::new(0.0, 0.0, 0.0));
             }
         }
-        ColorMatrix {
-            matrix,
-        }
+        ColorMatrix { matrix }
     }
 
     pub fn get(&self, x: usize, y: usize) -> Color {
@@ -64,7 +59,7 @@ impl ColorMatrix {
         let mut img = RgbImage::new(width as u32, height as u32);
         for x in 0..width {
             for y in 0..height {
-                img.put_pixel(x as u32, y as u32, self.matrix[y][x].to_rgb());
+                img.put_pixel(x as u32, y as u32, self.get(x, y).to_rgb());
             }
         }
         img

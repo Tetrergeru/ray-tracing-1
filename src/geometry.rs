@@ -1,8 +1,8 @@
 use crate::Float;
 
-use std::ops::{Add, AddAssign, Mul, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Div, Mul, Sub, SubAssign};
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Point {
     pub x: Float,
     pub y: Float,
@@ -16,6 +16,10 @@ impl Point {
 
     pub fn len(&self) -> Float {
         (*self * *self).sqrt()
+    }
+
+    pub fn normalize(&self) -> Point {
+        *self / self.len()
     }
 }
 
@@ -64,5 +68,13 @@ impl Mul<Float> for Point {
 
     fn mul(self, other: Float) -> Point {
         Point::new(self.x * other, self.y * other, self.z * other)
+    }
+}
+
+impl Div<Float> for Point {
+    type Output = Point;
+
+    fn div(self, other: Float) -> Point {
+        Point::new(self.x / other, self.y / other, self.z / other)
     }
 }

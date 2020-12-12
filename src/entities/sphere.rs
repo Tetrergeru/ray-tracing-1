@@ -1,4 +1,4 @@
-use super::{Entity, Float, IntersectionResult, Point};
+use super::{Float, IntersectionResult, Point};
 
 pub struct Sphere {
     origin: Point,
@@ -6,27 +6,34 @@ pub struct Sphere {
 }
 
 impl Sphere {
-    pub fn new(origin: Point, radius: Float, inverted_normal: bool) -> Self {
+    pub fn new(origin: Point, radius: Float) -> Self {
         Sphere {
             origin,
-            radius: if inverted_normal { -radius } else { radius },
+            radius: radius,
+        }
+    }
+
+    pub fn new_room(origin: Point, radius: Float) -> Self {
+        Sphere {
+            origin,
+            radius: -radius,
         }
     }
 
     fn normal(&self, point: Point) -> Point {
         if self.radius > 0.0 {
-            self.origin - point
+            (self.origin - point).normalize()
         } else {
-            point - self.origin
+            (point - self.origin).normalize()
         }
     }
 }
 
-impl Entity for Sphere {
-    fn intersect(&self, origin: Point, vector: Point) -> Option<IntersectionResult> {
-        let shifted_origin = origin - vector;
-        let a = vector * vector;
-        let b = 2.0 * (shifted_origin * vector);
+impl Sphere {
+    pub fn intersect(&self, origin: Point, direction: Point) -> Option<IntersectionResult> {
+        let shifted_origin = origin - self.origin;
+        let a = direction * direction;
+        let b = 2.0 * (shifted_origin * direction);
         let c = shifted_origin * shifted_origin - self.radius * self.radius;
         let mut discr = b * b - 4.0 * a * c;
         if discr < 0.0 {
@@ -42,10 +49,10 @@ impl Entity for Sphere {
             root_2 = Float::INFINITY
         };
         let min_root = min(root_1, root_2);
-        if min_root == f64::INFINITY {
+        if min_root == Float::INFINITY {
             return None;
         }
-        let delta = vector * min_root;
+        let delta = direction * min_root;
         let point = origin + delta;
         Some(IntersectionResult::new(
             point,
