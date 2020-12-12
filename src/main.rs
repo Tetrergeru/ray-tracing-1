@@ -1,4 +1,6 @@
 mod drawing;
+mod geometry;
+mod entities;
 
 use drawing::{
     Color,
