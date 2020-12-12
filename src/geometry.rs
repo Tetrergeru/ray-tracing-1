@@ -21,6 +21,19 @@ impl Point {
     pub fn normalize(&self) -> Point {
         *self / self.len()
     }
+
+    pub fn reflect(&self, normal: Point) -> Point {
+        *self - normal * (2.0 * (normal * *self))
+    }
+
+    pub fn refract(&self, normal: Point, coefficient: Float) -> Point {
+        let vec = self.normalize();
+        let n1 = vec.len();
+        let n2 = coefficient;
+        vec + normal
+            * (((n2 * n2 - n1 * n1) / (vec * normal).powi(2) + 1.0).sqrt() - 1.0)
+            * (vec * normal)
+    }
 }
 
 impl Add<Point> for Point {

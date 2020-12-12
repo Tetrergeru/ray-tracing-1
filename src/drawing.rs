@@ -1,3 +1,5 @@
+use std::ops::{Add, Mul, MulAssign};
+
 use image::{Rgb, RgbImage};
 
 use crate::Float;
@@ -26,6 +28,38 @@ fn to_byte(number: Float) -> u8 {
         0
     } else {
         (number * 255.0) as u8
+    }
+}
+
+impl Add<Color> for Color {
+    type Output = Color;
+
+    fn add(self, other: Color) -> Color {
+        Color {
+            r: self.r + other.r,
+            g: self.g + other.g,
+            b: self.b + other.b,
+        }
+    }
+}
+
+impl MulAssign<Float> for Color {
+    fn mul_assign(&mut self, other: Float) {
+        self.r *= other;
+        self.g *= other;
+        self.b *= other;
+    }
+}
+
+impl Mul<Float> for Color {
+    type Output = Color;
+
+    fn mul(self, other: Float) -> Color {
+        Color {
+            r: self.r * other,
+            g: self.g * other,
+            b: self.b * other,
+        }
     }
 }
 

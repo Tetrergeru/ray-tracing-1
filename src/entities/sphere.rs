@@ -42,17 +42,17 @@ impl Sphere {
         discr = discr.sqrt();
         let mut root_1 = (-b - discr) / (a * 2.0);
         let mut root_2 = (-b + discr) / (a * 2.0);
-        if root_1 < 0.0 {
+        if root_1 <= 0.0 {
             root_1 = Float::INFINITY
         };
-        if root_2 < 0.0 {
+        if root_2 <= 0.0 {
             root_2 = Float::INFINITY
         };
-        let min_root = min(root_1, root_2);
-        if min_root == Float::INFINITY {
+        let root = min(root_1, root_2);
+        if root == Float::INFINITY {
             return None;
         }
-        let delta = direction * min_root;
+        let delta = direction * root;
         let point = origin + delta;
         Some(IntersectionResult::new(
             point,
