@@ -1,10 +1,12 @@
 mod entity;
 mod sphere;
+mod triangle;
 
 use super::{geometry::Point, Float};
 
 pub use entity::Entity;
 pub use sphere::Sphere;
+pub use triangle::Triangle;
 
 pub struct IntersectionResult {
     pub intersection_point: Point,

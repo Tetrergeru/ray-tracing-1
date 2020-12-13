@@ -1,13 +1,15 @@
-use super::{IntersectionResult, Point, Sphere};
+use super::{IntersectionResult, Point, Sphere, Triangle};
 
 pub enum Entity {
     Sphere(Sphere),
+    Triangle(Triangle),
 }
 
 impl Entity {
-    pub fn intersect(&self, origin: Point, vector: Point) -> Option<IntersectionResult> {
+    pub fn intersect(&self, origin: Point, direction: Point) -> Option<IntersectionResult> {
         match self {
-            Entity::Sphere(sphere) => sphere.intersect(origin, vector),
+            Entity::Sphere(sphere) => sphere.intersect(origin, direction),
+            Entity::Triangle(triangle) => triangle.intersect(origin, direction),
         }
     }
 }

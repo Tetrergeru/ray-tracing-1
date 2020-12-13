@@ -11,9 +11,42 @@ pub struct Color {
     b: Float,
 }
 
+macro_rules! define_colors {
+    ($($color_name:ident ($r:expr, $g:expr, $b:expr))*) => {
+        $(
+            #[allow(dead_code)]
+            pub const $color_name: Color =
+            Color {
+                r: $r as Float / 255.0,
+                g: $g as Float / 255.0,
+                b: $b as Float / 255.0
+            };)*
+    };
+}
+
 impl Color {
+    define_colors![
+        WHITE (255, 255, 255)
+        BLACK (0, 0, 0)
+        RED (255, 0, 0)
+        GREEN (0, 255, 0)
+        BLUE (0, 0, 255)
+        ORANGE (255, 165, 0)
+        PURPLE (128, 0, 128)
+        BROWN (165, 42, 42)
+        CYAN (0, 255, 255)
+        DARK_GREEN (0, 100, 0)
+        MOCCASIN (255, 228, 181)
+        GOLD (255, 215, 0)
+        MAGENTA (255, 0, 255)
+    ];
+
     pub fn new(r: Float, g: Float, b: Float) -> Self {
         Self { r, g, b }
+    }
+
+    pub fn from_rgb(r: u8, g: u8, b: u8) -> Self {
+        Self::new(r as Float / 255.0, g as Float / 255.0, b as Float / 255.0)
     }
 
     pub fn to_rgb(&self) -> Rgb<u8> {

@@ -57,12 +57,13 @@ fn trace_ray(world: &World, origin: Point, direction: Point, depth: usize) -> Co
 
     let mut shade = 0.0;
     for &light in world.light.iter() {
-        let shadowed = match world.cast_ray(entity.intersection_point, light - entity.intersection_point) {
-            None => false,
-            Some(shadow_entity) => {
-                shadow_entity.intersection.distance < (light - entity.intersection_point).len()
-            }
-        };
+        let shadowed =
+            match world.cast_ray(entity.intersection_point, light - entity.intersection_point) {
+                None => false,
+                Some(shadow_entity) => {
+                    shadow_entity.intersection.distance < (light - entity.intersection_point).len()
+                }
+            };
         if shadowed {
             shade += KA * IA;
         } else {

@@ -34,6 +34,14 @@ impl Point {
             * (((n2 * n2 - n1 * n1) / (vec * normal).powi(2) + 1.0).sqrt() - 1.0)
             * (vec * normal)
     }
+
+    pub fn dot(self, other: Point) -> Point {
+        Point::new(
+            self.y * other.z - self.z * other.y,
+            self.z * other.x - self.x * other.z,
+            self.x * other.y - self.y * other.x,
+        )
+    }
 }
 
 impl Add<Point> for Point {
