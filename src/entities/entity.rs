@@ -1,5 +1,6 @@
 use super::{IntersectionResult, Point, Sphere, Triangle};
 
+#[derive(Clone)]
 pub enum Entity {
     Sphere(Sphere),
     Triangle(Triangle),

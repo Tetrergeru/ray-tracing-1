@@ -1,4 +1,4 @@
-use std::ops::{Add, Mul, MulAssign};
+use std::ops::{Add, AddAssign, Mul, MulAssign};
 
 use image::{Rgb, RgbImage};
 
@@ -130,5 +130,17 @@ impl ColorMatrix {
             }
         }
         img
+    }
+}
+
+impl AddAssign<ColorMatrix> for ColorMatrix {
+    fn add_assign(&mut self, other: ColorMatrix) {
+        let width = self.matrix[0].len();
+        let height = self.matrix.len();
+        for x in 0..width {
+            for y in 0..height {
+                self.set(x, y, self.get(x, y) + other.get(x, y));
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 use super::{Float, IntersectionResult, Point};
 
+#[derive(Clone)]
 pub struct Sphere {
     origin: Point,
     radius: Float,

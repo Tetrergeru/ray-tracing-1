@@ -5,6 +5,7 @@ use crate::{
     Float,
 };
 
+#[derive(Clone)]
 pub struct World {
     entities: Vec<(Entity, Material)>,
     pub light: Vec<Point>,

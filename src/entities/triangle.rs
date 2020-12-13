@@ -1,5 +1,6 @@
 use super::{Float, IntersectionResult, Point};
 
+#[derive(Clone)]
 pub struct Triangle {
     origin: Point,
     u: Point,
@@ -28,7 +29,7 @@ impl Triangle {
             None => return None,
             Some(point) => point,
         };
-        if !self.triangle_contains_2(intersection_point) {
+        if !self.triangle_contains(intersection_point) {
             return None;
         }
         Some(IntersectionResult::new(
@@ -60,21 +61,30 @@ impl Triangle {
 
     // we find point coordinates in coordinate system with basis (u, v)
     // if u > 0, v > 0 and u + v < 1, then point is inside of the triangle
+    #[allow(dead_code)]
     fn triangle_contains(&self, point: Point) -> bool {
         let point = point - self.origin;
 
-        let point_v =
-            (point.x * self.v.y - point.y * self.v.x) / (self.u.x * self.v.y - self.u.y * self.v.x);
-        if point_v < 0.0 {
+        let det = Self::det(self.u, self.v);
+
+        let point_u = Self::det(point, self.v) / det;
+        if point_u < 0.0 {
             return false;
         }
 
-        let point_u =
-            (point.x * self.u.y - point.y * self.u.x) / (self.v.x * self.u.y - self.v.y * self.u.x);
+        let point_v = Self::det(self.u, point) / det;
+        if point_v < 0.0 || point_v + point_u > 1.0 {
+            return false;
+        }
 
-        point_u > 0.0 && point_u + point_v < 1.0
+        true
     }
 
+    fn det(a: Point, b: Point) -> Float {
+        a.dot(b).sum()
+    }
+
+    #[allow(dead_code)]
     fn triangle_contains_2(&self, point: Point) -> bool {
         let point = point - self.origin;
         Self::in_angle(Point::new(0.0, 0.0, 0.0), self.u, self.v, point)

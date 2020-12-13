@@ -1,3 +1,6 @@
+use std::sync::mpsc::{self, Receiver, Sender};
+use std::thread;
+
 use crate::{
     drawing::{Color, ColorMatrix},
     geometry::Point,
@@ -7,9 +10,59 @@ use crate::{
 
 const FOV: Float = std::f64::consts::PI / 1.5;
 
+#[allow(dead_code)]
 pub fn trace(world: &World, width: usize, height: usize) -> ColorMatrix {
+    trace_in_vertical_bounds(world, width, height, 0, height)
+}
+
+const THREAD_NUMBER: usize = 2;
+
+#[allow(dead_code)]
+pub fn trace_parallel(world: &World, width: usize, height: usize) -> ColorMatrix {
     let mut matrix = ColorMatrix::new(width, height);
-    for j in 0..height {
+    let (sender, receiver): (Sender<ColorMatrix>, Receiver<ColorMatrix>) = mpsc::channel();
+    let batch_size = height / THREAD_NUMBER;
+    let start = std::time::Instant::now();
+    for i in 0..THREAD_NUMBER {
+        let sender = sender.clone();
+        let world = world.clone();
+        let from = batch_size * i;
+        let to = if i == THREAD_NUMBER - 1 {
+            height
+        } else {
+            batch_size * i + batch_size
+        };
+        println!("{}", to - from);
+        thread::spawn(move || {
+            sender
+                .send(trace_in_vertical_bounds(&world, width, height, from, to))
+                .expect("Could not send result");
+        });
+    }
+    println!(
+        "All threads created for {} secs",
+        (std::time::Instant::now() - start).as_secs_f64()
+    );
+
+    for _ in 0..THREAD_NUMBER {
+        matrix += receiver.recv().expect("Could not receive result");
+    }
+    println!(
+        "All messages received for {} secs",
+        (std::time::Instant::now() - start).as_secs_f64()
+    );
+    matrix
+}
+
+fn trace_in_vertical_bounds(
+    world: &World,
+    width: usize,
+    height: usize,
+    from: usize,
+    to: usize,
+) -> ColorMatrix {
+    let mut matrix = ColorMatrix::new(width, height);
+    for j in from..to {
         for i in 0..width {
             matrix.set(
                 i,

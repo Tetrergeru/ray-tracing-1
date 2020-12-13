@@ -11,9 +11,9 @@ type Float = f64;
 
 fn main() {
     let start = std::time::Instant::now();
-    trace::trace(&scene_2(), 1200, 1200)
+    trace::trace_parallel(&scene_1(), 3600, 3600)
         .to_image()
-        .save("foo.png")
+        .save("result.png")
         .expect("Could not save image file");
     println!("{}", (std::time::Instant::now() - start).as_secs_f64());
 }
@@ -80,7 +80,7 @@ fn scene_2() -> World {
             Material::new_mirror(Color::RED, 0.5),
         ),
     );
-    
+
     entities.push((
         Entity::Sphere(Sphere::new(Point::new(-4.0, -2.0, 9.0), 3.0)),
         Material::new_transparent(Color::DARK_GREEN, 0.7, 1.33),
@@ -116,7 +116,10 @@ fn scene_2() -> World {
 
     for i in 0..5 {
         entities.push((
-            Entity::Sphere(Sphere::new(Point::new(-8.0 + i as Float * 4.0, -8.0, 18.0), 2.0)),
+            Entity::Sphere(Sphere::new(
+                Point::new(-8.0 + i as Float * 4.0, -8.0, 18.0),
+                2.0,
+            )),
             Material::new_mirror(Color::MAGENTA, i as Float / 5.0),
         ))
     }

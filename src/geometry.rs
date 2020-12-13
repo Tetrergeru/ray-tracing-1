@@ -42,6 +42,10 @@ impl Point {
             self.x * other.y - self.y * other.x,
         )
     }
+
+    pub fn sum(self) -> Float {
+        self.x + self.y + self.z
+    }
 }
 
 impl Add<Point> for Point {
