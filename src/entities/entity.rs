@@ -1,9 +1,10 @@
-use super::{IntersectionResult, Point, Sphere, Triangle};
+use super::{IntersectionResult, Plane, Point, Sphere, Triangle};
 
 #[derive(Clone)]
 pub enum Entity {
     Sphere(Sphere),
     Triangle(Triangle),
+    Plane(Plane),
 }
 
 impl Entity {
@@ -11,6 +12,7 @@ impl Entity {
         match self {
             Entity::Sphere(sphere) => sphere.intersect(origin, direction),
             Entity::Triangle(triangle) => triangle.intersect(origin, direction),
+            Entity::Plane(plane) => plane.intersect(origin, direction),
         }
     }
 }

@@ -10,8 +10,7 @@ use world::World;
 type Float = f64;
 
 fn main() {
-    ray_trace();
-    //trace::path_trace(&scene_2(), "path_result_1.png".to_string(), 500, 500);
+    trace::path_trace(&scene_2(), "path_result_2.png".to_string(), 200, 200);
 }
 
 #[allow(dead_code)]
@@ -26,7 +25,7 @@ fn ray_trace() {
 
 use crate::{
     drawing::Color,
-    entities::{Entity, Sphere, Triangle},
+    entities::{Entity, Plane, Sphere, Triangle},
     geometry::Point,
     material::Material,
 };
@@ -102,7 +101,7 @@ fn scene_2() -> World {
     ));
 
     entities.push((
-        Entity::Sphere(Sphere::new(Point::new(5.0, 8.0, 7.0), 3.0)),
+        Entity::Sphere(Sphere::new(Point::new(5.0, 7.0, 7.0), 3.0)),
         Material::new_light(Color::from_rgb(100, 100, 255), 10.0),
     ));
 
@@ -125,14 +124,25 @@ fn scene_2() -> World {
         Material::new_mirror(Color::GOLD, 0.3),
     ));
 
-    entities.splice(
-        entities.len()..,
-        absolute_cube(
-            Point::new(-20.0, 5.0, -20.0),
-            Point::new(20.0, 13.0, 30.0),
-            Material::new_transparent(Color::from_rgb(100, 255, 255), 0.8, 1.333),
-        ),
-    );
+    entities.push((
+        Entity::Plane(Plane::new(
+            Point::new(0.0, 5.0, 0.0),
+            Point::new(0.0, 5.0, 0.1),
+            Point::new(0.1, 5.0, 0.0),
+        )),
+        //Material::new_diffuse(Color::from_rgb(100, 255, 255)),
+        //Material::new(Color::from_rgb(100, 255, 255), 0.9, 0.0, 0.8, 1.33, 0.0),
+        Material::new_transparent(Color::from_rgb(100, 255, 255), 0.9, 1.333),
+    ));
+
+    // entities.splice(
+    //     entities.len()..,
+    //     absolute_cube(
+    //         Point::new(-20.0, 5.0, -20.0),
+    //         Point::new(20.0, 13.0, 30.0),
+    //         Material::new_transparent(Color::from_rgb(100, 255, 255), 0.8, 1.333),
+    //     ),
+    // );
 
     for i in 0..5 {
         entities.push((

@@ -1,11 +1,12 @@
 mod entity;
+mod plane;
 mod sphere;
 mod triangle;
-mod plane;
 
 use super::{geometry::Point, Float};
 
 pub use entity::Entity;
+pub use plane::Plane;
 pub use sphere::Sphere;
 pub use triangle::Triangle;
 

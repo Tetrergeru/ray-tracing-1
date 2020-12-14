@@ -46,6 +46,28 @@ impl Point {
     pub fn sum(self) -> Float {
         self.x + self.y + self.z
     }
+
+    pub fn rotate(&self, angles: Point) -> Point {
+        let sin = Point::new(angles.x.sin(), angles.y.sin(), angles.z.sin());
+        let cos = Point::new(angles.x.cos(), angles.y.cos(), angles.z.cos());
+
+        let vec = Point::new(
+            self.x,
+            self.y * cos.x + self.z * sin.x,
+            self.y * -sin.x + self.z * cos.x,
+        );
+        let vec = Point::new(
+            vec.x * cos.y - vec.z * sin.y,
+            vec.y,
+            vec.x * sin.y + vec.z * cos.y,
+        );
+        let vec = Point::new(
+            vec.x * cos.z + vec.y * sin.z,
+            -vec.x * sin.z + vec.y * cos.z,
+            vec.z,
+        );
+        vec
+    }
 }
 
 impl Add<Point> for Point {

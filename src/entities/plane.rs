@@ -1,13 +1,13 @@
 use super::{Float, IntersectionResult, Point};
 
 #[derive(Clone)]
-pub struct Triangle {
+pub struct Plane {
     origin: Point,
     u: Point,
     v: Point,
 }
 
-impl Triangle {
+impl Plane {
     pub fn new(p1: Point, p2: Point, p3: Point) -> Self {
         Self {
             origin: p1,
@@ -17,9 +17,14 @@ impl Triangle {
     }
 
     fn normal(&self, u: Float, v: Float) -> Point {
-        let vec = self.u.dot(self.v).normalize();
-
-        vec
+        self.u
+            .dot(self.v)
+            .rotate(Point::new(
+                u.sin() * (v * 0.5).cos() * 0.5,
+                (u * 0.2).sin() + v.sin() * 0.7,
+                u.cos() * v.cos() * 0.1,
+            ))
+            .normalize()
     }
 
     pub fn intersect(&self, origin: Point, direction: Point) -> Option<IntersectionResult> {
@@ -59,7 +64,7 @@ impl Triangle {
         let point_u = Self::det(point, self.v) / det;
 
         let point_v = Self::det(self.u, point) / det;
-        
+
         (point_u, point_v)
     }
 

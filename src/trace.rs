@@ -14,7 +14,9 @@ const FOV: Float = std::f64::consts::PI / 1.5;
 
 const MAX_DEPTH: usize = 10;
 
-const THREAD_NUMBER: usize = 2;
+fn thread_number() -> usize {
+    num_cpus::get()
+}
 
 #[allow(dead_code)]
 pub fn trace(world: &World, width: usize, height: usize) -> ColorMatrix {
@@ -23,15 +25,16 @@ pub fn trace(world: &World, width: usize, height: usize) -> ColorMatrix {
 
 #[allow(dead_code)]
 pub fn trace_parallel(world: &World, width: usize, height: usize) -> ColorMatrix {
+    let thread_number = thread_number();
     let mut matrix = ColorMatrix::new(width, height);
     let (sender, receiver): (Sender<ColorMatrix>, Receiver<ColorMatrix>) = mpsc::channel();
-    let batch_size = height / THREAD_NUMBER;
+    let batch_size = height / thread_number;
     let start = std::time::Instant::now();
-    for i in 0..THREAD_NUMBER {
+    for i in 0..thread_number {
         let sender = sender.clone();
         let world = world.clone();
         let from = batch_size * i;
-        let to = if i == THREAD_NUMBER - 1 {
+        let to = if i == thread_number - 1 {
             height
         } else {
             batch_size * i + batch_size
@@ -48,7 +51,7 @@ pub fn trace_parallel(world: &World, width: usize, height: usize) -> ColorMatrix
         (std::time::Instant::now() - start).as_secs_f64()
     );
 
-    for _ in 0..THREAD_NUMBER {
+    for _ in 0..thread_number {
         matrix += receiver.recv().expect("Could not receive result");
     }
     println!(
@@ -161,17 +164,15 @@ fn trace_ray(world: &World, origin: Point, direction: Point, depth: usize) -> Co
 pub fn path_trace(world: &World, fname: String, width: usize, height: usize) {
     let mut matrix = ColorMatrix::new(width, height);
     let (sender, receiver): (Sender<ColorMatrix>, Receiver<ColorMatrix>) = mpsc::channel();
-    for _ in 0..THREAD_NUMBER {
+    for _ in 0..thread_number() {
         let sender = sender.clone();
         let world = world.clone();
         thread::spawn(move || loop {
             let mut matrix = ColorMatrix::new(width, height);
-            for j in 0..height {
-                for i in 0..width {
-                    matrix.set(
-                        i,
-                        j,
-                        trace_path(
+            for iteration in 0..8 {
+                for j in 0..height {
+                    for i in 0..width {
+                        let traced = trace_path(
                             &world,
                             Point::new(0.0, 0.0, 0.0),
                             vec_for_angle(
@@ -179,8 +180,14 @@ pub fn path_trace(world: &World, fname: String, width: usize, height: usize) {
                                 (j as Float - height as Float / 2.0) / height as Float * FOV,
                             ),
                             0,
-                        ),
-                    );
+                        );
+                        matrix.set(
+                            i,
+                            j,
+                            (matrix.get(i, j) * iteration as Float + traced)
+                                * (1.0 / (iteration + 1) as Float),
+                        );
+                    }
                 }
             }
             sender.send(matrix).expect("could not send matrix");
@@ -189,13 +196,11 @@ pub fn path_trace(world: &World, fname: String, width: usize, height: usize) {
     for iteration in 0.. {
         let new_matrix = receiver.recv().expect("failed to receive");
         matrix.add_iteration(new_matrix, iteration);
-        if iteration % 8 == 0 {
-            print!("iteration {} finished, ", iteration);
-            match matrix.to_image().save(fname.as_str()) {
-                Ok(_) => println!("image flushed"),
-                Err(_) => println!("problems flushing image"),
-            };
-        }
+        print!("iteration {} finished, ", iteration);
+        match matrix.to_image().save(fname.as_str()) {
+            Ok(_) => println!("image flushed"),
+            Err(_) => println!("problems flushing image"),
+        };
     }
 }
 
@@ -255,23 +260,5 @@ fn diffuse(vec: Point, diffusion: Float) -> Point {
         (rng.gen::<f64>() - 0.0) * max_angle,
     );
 
-    let sin = Point::new(angle.x.sin(), angle.y.sin(), angle.z.sin());
-    let cos = Point::new(angle.x.cos(), angle.y.cos(), angle.z.cos());
-
-    let vec = Point::new(
-        vec.x,
-        vec.y * cos.x + vec.z * sin.x,
-        vec.y * -sin.x + vec.z * cos.x,
-    );
-    let vec = Point::new(
-        vec.x * cos.y - vec.z * sin.y,
-        vec.y,
-        vec.x * sin.y + vec.z * cos.y,
-    );
-    let vec = Point::new(
-        vec.x * cos.z + vec.y * sin.z,
-        -vec.x * sin.z + vec.y * cos.z,
-        vec.z,
-    );
-    vec
+    vec.rotate(angle)
 }
