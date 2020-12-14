@@ -1,6 +1,7 @@
 mod entity;
 mod sphere;
 mod triangle;
+mod plane;
 
 use super::{geometry::Point, Float};
 

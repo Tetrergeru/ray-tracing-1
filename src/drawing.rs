@@ -96,6 +96,18 @@ impl Mul<Float> for Color {
     }
 }
 
+impl Mul<Color> for Color {
+    type Output = Color;
+
+    fn mul(self, other: Color) -> Color {
+        Color {
+            r: self.r * other.r,
+            g: self.g * other.g,
+            b: self.b * other.b,
+        }
+    }
+}
+
 pub struct ColorMatrix {
     matrix: Vec<Vec<Color>>,
 }
@@ -130,6 +142,21 @@ impl ColorMatrix {
             }
         }
         img
+    }
+
+    pub fn add_iteration(&mut self, other: ColorMatrix, iteration: usize) {
+        let width = self.matrix[0].len();
+        let height = self.matrix.len();
+        for x in 0..width {
+            for y in 0..height {
+                self.set(
+                    x,
+                    y,
+                    (self.get(x, y) * iteration as Float + other.get(x, y))
+                        * (1.0 / (iteration + 1) as Float),
+                );
+            }
+        }
     }
 }
 

@@ -10,8 +10,14 @@ use world::World;
 type Float = f64;
 
 fn main() {
+    ray_trace();
+    //trace::path_trace(&scene_2(), "path_result_1.png".to_string(), 500, 500);
+}
+
+#[allow(dead_code)]
+fn ray_trace() {
     let start = std::time::Instant::now();
-    trace::trace_parallel(&scene_1(), 3600, 3600)
+    trace::trace_parallel(&scene_2(), 500, 500)
         .to_image()
         .save("result.png")
         .expect("Could not save image file");
@@ -63,13 +69,22 @@ fn scene_2() -> World {
         Point::new(-10.0, -10.0, -1.0),
         Point::new(10.0, 10.0, 20.0),
         &vec![
-            Material::new_diffuse(Color::BLUE),
-            Material::new_diffuse(Color::ORANGE),
+            Material::new_diffuse(Color::WHITE),
+            Material::new_diffuse(Color::WHITE),
             Material::new_mirror(Color::GREEN, 0.5),
             Material::new_diffuse(Color::WHITE),
             Material::new_diffuse(Color::WHITE),
-            Material::new_mirror(Color::PURPLE, 0.5),
+            Material::new_mirror(Color::WHITE, 0.5),
         ],
+    );
+
+    entities.splice(
+        entities.len()..,
+        cube(
+            Point::new(-3.0, -9.5, 7.0),
+            Point::new(6.0, 1.0, 6.0),
+            Material::new_light(Color::WHITE, 10.0),
+        ),
     );
 
     entities.splice(
@@ -77,13 +92,18 @@ fn scene_2() -> World {
         cube(
             Point::new(-6.0, 1.0, 7.0),
             Point::new(4.0, 9.0, 4.0),
-            Material::new_mirror(Color::RED, 0.5),
+            Material::new_diffuse(Color::BROWN),
         ),
     );
 
     entities.push((
         Entity::Sphere(Sphere::new(Point::new(-4.0, -2.0, 9.0), 3.0)),
-        Material::new_transparent(Color::DARK_GREEN, 0.7, 1.33),
+        Material::new_transparent(Color::CYAN, 0.8, 1.33),
+    ));
+
+    entities.push((
+        Entity::Sphere(Sphere::new(Point::new(5.0, 8.0, 7.0), 3.0)),
+        Material::new_light(Color::from_rgb(100, 100, 255), 10.0),
     ));
 
     entities.splice(
@@ -91,7 +111,7 @@ fn scene_2() -> World {
         cube(
             Point::new(0.0, 3.0, 12.0),
             Point::new(2.0, 7.0, 2.0),
-            Material::new_diffuse(Color::BROWN),
+            Material::new_mirror(Color::RED, 0.5),
         ),
     );
 
@@ -108,9 +128,9 @@ fn scene_2() -> World {
     entities.splice(
         entities.len()..,
         absolute_cube(
-            Point::new(-10.0, 5.0, -1.0),
-            Point::new(10.0, 10.0, 20.0),
-            Material::new(Color::CYAN, 0.1, 0.5, 1.33),
+            Point::new(-20.0, 5.0, -20.0),
+            Point::new(20.0, 13.0, 30.0),
+            Material::new_transparent(Color::from_rgb(100, 255, 255), 0.8, 1.333),
         ),
     );
 
@@ -123,6 +143,76 @@ fn scene_2() -> World {
             Material::new_mirror(Color::MAGENTA, i as Float / 5.0),
         ))
     }
+
+    World::new(
+        entities,
+        vec![Point::new(5.0, -7.0, 13.0), Point::new(-5.0, -5.0, 1.0)],
+    )
+}
+
+#[allow(dead_code)]
+fn scene_3() -> World {
+    let mut entities = room(
+        Point::new(-10.0, -10.0, -1.0),
+        Point::new(10.0, 5.0, 20.0),
+        &vec![
+            Material::new_diffuse(Color::BLUE),
+            Material::new_diffuse(Color::ORANGE),
+            Material::new_diffuse(Color::GREEN),
+            Material::new_mirror(Color::WHITE, 0.0),
+            Material::new_diffuse(Color::WHITE),
+            Material::new_diffuse(Color::PURPLE),
+        ],
+    );
+
+    entities.push((
+        Entity::Sphere(Sphere::new(Point::new(-4.0, 2.0, 9.0), 3.0)),
+        Material::new_transparent(Color::WHITE, 0.5, 1.33),
+    ));
+
+    entities.push((
+        Entity::Sphere(Sphere::new(Point::new(1.0, -11.0, 13.0), 5.0)),
+        Material::new_light(Color::WHITE, 5.0),
+    ));
+
+    World::new(
+        entities,
+        vec![Point::new(5.0, -7.0, 13.0), Point::new(-5.0, -5.0, 1.0)],
+    )
+}
+
+#[allow(dead_code)]
+fn scene_4() -> World {
+    let mut entities = room(
+        Point::new(-10.0, -10.0, -1.0),
+        Point::new(10.0, 6.0, 20.0),
+        &vec![
+            Material::new_diffuse(Color::BLUE),
+            Material::new_diffuse(Color::ORANGE),
+            Material::new_diffuse(Color::GREEN),
+            Material::new_diffuse(Color::WHITE),
+            Material::new_diffuse(Color::WHITE),
+            Material::new_diffuse(Color::PURPLE),
+        ],
+    );
+
+    entities.splice(
+        entities.len()..,
+        cube(
+            Point::new(-5.0, 1.0, 10.0),
+            Point::new(10.0, 5.0, 5.0),
+            Material::new_transparent(Color::from_rgb(100, 255, 255), 0.8, 1.333),
+        ),
+    );
+
+    entities.splice(
+        entities.len()..,
+        cube(
+            Point::new(-2.0, -2.0, 12.0),
+            Point::new(1.5, 9.0, 1.5),
+            Material::new_diffuse(Color::from_rgb(100, 255, 255)),
+        ),
+    );
 
     World::new(
         entities,
